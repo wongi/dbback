@@ -1,0 +1,20 @@
+CREATE TABLE result_db_tbname (
+  local_ip char(15) NOT NULL DEFAULT 'localhost' COMMENT '本地脚本路径',
+  db_type char(10) NOT NULL DEFAULT 'mysql' COMMENT '检查数据库类型',
+  host_ip char(15) NOT NULL COMMENT '检测实例IP',
+  bak_db_flag int COMMENT '数据库备份标志0 成功，1失败, -1不操作',
+  bak_store_flag int COMMENT '备份上传标志0 成功，1失败, -1不操作',
+  bak_meta_tb char(255) COMMENT '备份记录的表',
+  bak_file_name char(255) COMMENT '备份文件名',
+  bak_file_size char(255) DEFAULT '0m' COMMENT '备份文件大小(M)',
+  bak_total_sum int COMMENT '备份总数量',
+  bak_total_size char(255) DEFAULT '0m' COMMENT '备份总大小(M)',
+  bak_frequency char(4) DEFAULT NULL COMMENT '备份的频率',
+  bak_strategy char(10) DEFAULT NULL COMMENT '全量还是增量',
+  bak_oss_bucket char(255) NOT NULL COMMENT 'oss存储路径',
+  bak_sysdisk_used int COMMENT '备份文件存放挂载点磁盘使用率',
+  error_code int(11) NOT NULL COMMENT '异常编码',
+  error_msg varchar(255) DEFAULT NULL COMMENT '异常详情',
+  check_time datetime NOT NULL COMMENT '检测结果',
+  KEY index_key (db_type, host_ip)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;

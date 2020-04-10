@@ -1,0 +1,9 @@
+['2020-04-09 09:37:57' - logfile] - [INFO] - [__init__ 24 ] : dfsffdf
+['2020-04-09 09:37:57' - logfile] - [ERROR] - [__init__ 25 ] : error
+['2020-04-09 09:37:59' - logfile] - [INFO] - [__init__ 27 ] : 13
+['2020-04-09 09:37:59' - logfile] - [ERROR] - [__init__ 28 ] : err2
+['2020-04-09 10:20:15' - logfile] - [INFO] - [test 5 ] : sansan
+['2020-04-09 10:53:25' - logfile] - [INFO] - [test 4 ] : gougou
+['2020-04-09 10:54:49' - logfile] - [INFO] - [test 4 ] : dandan
+['2020-04-09 11:02:01' - logfile] - [INFO] - [test 4 ] : dandan
+['2020-04-09 11:05:24' - logfile] - [INFO] - [test 4 ] : dandan
