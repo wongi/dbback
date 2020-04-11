@@ -11,6 +11,11 @@ logger = utils.get_logger()
 class Param(Enum):
     W = 1
     R = 2
+    CRONTAB_ADD = 'crontab -e '
+    CRONTAB_LIS = 'crontab -l '
+    MKDIR = 'mkdir '
+    GREP = 'grep '
+    CP = 'cp '
 
 # windos连接方式和linux连接方式
 class ConnectHost:

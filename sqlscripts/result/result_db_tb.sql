@@ -3,6 +3,7 @@ CREATE TABLE result_db_tbname (
   db_type char(10) NOT NULL DEFAULT 'mysql' COMMENT '检查数据库类型',
   host_ip char(15) NOT NULL COMMENT '检测实例IP',
   bak_db_flag int COMMENT '数据库备份标志0 成功，1失败, -1不操作',
+  bak_check_flag int COMMENT '数据库备份标志0 成功，1失败, -1不操作',
   bak_store_flag int COMMENT '备份上传标志0 成功，1失败, -1不操作',
   bak_meta_tb char(255) COMMENT '备份记录的表',
   bak_file_name char(255) COMMENT '备份文件名',

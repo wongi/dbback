@@ -150,3 +150,30 @@ class SqlServerConfig(HostConfig):
                f'sqlserver_db_login_user:{self.sqlserver_db_login_user} \n' \
                f'sqlserver_db_login_pass:{self.sqlserver_db_login_pass} \n'
 
+
+class Result(object):  # 待修正
+    local_ip = ''
+    host_ip = ''
+    db_type = ''
+    bak_db_flag = -1
+    bak_check_flag = -1
+    bak_store_flag = -1
+    bak_meta_tb = ''
+    bak_file_name = ''
+    bak_file_size = '0m'
+    bak_total_sum = 0
+    bak_total_size = '0m'
+    bak_script_file = ''
+    bak_dir_name = ''
+    bak_dir_log = ''
+    bak_frequency = 0
+    bak_strategy = ''
+    bak_oss_bucket = ''
+    bak_sys_used = 0
+    error_code = 1
+    error_msg = ''
+    check_time = ''
+
+    def __init__(self, rs_config, host_config):
+        pass
+
