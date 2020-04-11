@@ -46,19 +46,36 @@ class Proceed:
             logger.error(f'There are not any configs matched under the path {cls.cfg_path}')
             raise FileNotFoundError
 
-    # 2、对config中的flag进行确认，3个数值，第一个表示备份，第二个表示检测，第三个表示异地存储，1表示开启，0表示关闭
+    # 3、备份处理
     @classmethod
     def do_bak(cls, instance):
+        # 判断端口22为linux 3389windows
+        # 判断时间是否设置，设置后，为定时任务，未设置手动备份
+
+        # 判定目录是不是存在，不存在创建
+        # 如果时间设置不为null，判定定时任务是否开启，没有开启的话，开启任务
+        # 如果时间设置为null, 手动备份
+        # 检测备份结果，并设置状态，或者异常信息
         pass
 
+    # 4、备份检测
     @classmethod
     def do_check(cls, instance):
+        # 判断端口22为linux 3389windows
+        # 判断实例的各个ip的对应结果实例是否为null，为null则进行检测，不为则进行检测
+        # 条件（是否有备份文件生成，或者表是不是有备份记录）
         pass
 
+    # 5、异地存储
     @classmethod
     def do_store(cls, instance):
+        # 对各个ip列表进行逻辑处理，分为windows、linux
+        # 回传文件至本地
+        # 判定ossbucket是不是存在
+        # 上传备份文件至bucket
         pass
 
+    # 2、对config中的flag进行确认，3个数值，第一个表示备份，第二个表示检测，第三个表示异地存储，1表示开启，0表示关闭
     @classmethod
     def do_proceed(cls, instance):
         bak_flag = 0
@@ -78,14 +95,6 @@ class Proceed:
     def proceed(cls):
         for instance in cls.config_database_bean_list:
             cls.do_proceed(instance)
-
-    # 对各个ip列表进行逻辑处理，分为windows、linux
-
-    # 3、备份处理
-
-    # 4、备份检测
-
-    # 5、异地存储
 
     # 6、数据库存储
 

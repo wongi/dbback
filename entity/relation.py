@@ -73,6 +73,7 @@ class HostConfig(Config):
     host_bak_script_file = ''  # 数据库服务器备份脚本
     host_bak_dir_name = ''     # 数据库服务器备份路径
     host_bak_log_name = ''     # 数据库服务器备份日志
+    host_bak_log_name = ''     # 数据库服务器备份正则
     host_bak_time = ''         # 数据库服务器备份时间
     oss_bucket = ''            # 数据库相应的oss路径
     host_proceed_flag = 0   # 数据库对应的操作标志
@@ -82,6 +83,7 @@ class HostConfig(Config):
         self.host_bak_script_file = kwargs.get('host_bak_script_file')
         self.host_bak_dir_name = kwargs.get('host_bak_dir_name')
         self.host_bak_log_name = kwargs.get('host_bak_log_name')
+        self.host_bak_file_name = kwargs.get('host_bak_file_name')
         self.host_bak_time = kwargs.get('host_bak_time')
         self.oss_bucket = kwargs.get('oss_bucket')
         self.host_proceed_flag = kwargs.get('host_proceed_flag')
@@ -97,9 +99,10 @@ class MysqlHostConfig(HostConfig):
                          host_bak_script_file=kwargs.get('mysql_host_bak_script_file'),
                          host_bak_dir_name=kwargs.get('mysql_host_bak_dir_name'),
                          host_bak_log_name=kwargs.get('mysql_host_bak_log_name'),
+                         host_bak_file_name=kwargs.get('mysql_host_bak_file_name'),
                          host_bak_time=kwargs.get('mysql_host_bak_time'),
                          oss_bucket=kwargs.get('mysql_oss_bucket'),
-                         host_proceed_flag = kwargs.get('mysql_host_proceed_flag'))
+                         host_proceed_flag=kwargs.get('mysql_host_proceed_flag'))
 
     def __str__(self):
         return f'host_ips:{self.host_ips} \n' \
@@ -127,6 +130,7 @@ class SqlServerConfig(HostConfig):
                          host_bak_script_file=kwargs.get('sqlserver_host_bak_script_file'),
                          host_bak_dir_name=kwargs.get('sqlserver_host_bak_dir_name'),
                          host_bak_log_name=kwargs.get('sqlserver_host_bak_log_name'),
+                         host_bak_file_name=kwargs.get('sqlserver_host_bak_file_name'),
                          host_bak_time=kwargs.get('sqlserver_host_bak_time'),
                          oss_bucket=kwargs.get('sqlserver_oss_bucket'),
                          host_proceed_flag = kwargs.get('sqlserver_host_proceed_flag'))

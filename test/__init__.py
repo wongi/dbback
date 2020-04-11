@@ -84,7 +84,10 @@ dictcon = {}
 
 def test_clear_dict():
     dictcon['1'] = 2
-test_clear_dict()
-print(dictcon)
-dictcon.clear()
-print(dictcon)
+# test_clear_dict()
+# print(dictcon)
+# dictcon.clear()
+# print(dictcon)
+
+list = ['1','2','3','4']
+print('1' in list)
