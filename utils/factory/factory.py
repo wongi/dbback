@@ -62,6 +62,7 @@ class MysqlBeanFactory(GenerateBeanFactory):
     def createConfigBean(cls, file):
         logger.info(f'mysql factory create parseBean by file {file}')
         super(MysqlBeanFactory,cls).createConfigBean(file)
+        cls.cfg_mapping['name'] = 'mysql'
         return MysqlHostConfig(**cls.cfg_mapping)
 
 
@@ -70,6 +71,7 @@ class SqlServerBeanFactory(GenerateBeanFactory):
     def createConfigBean(cls, file):
         logger.info(f'sqlserver factory create parseBean by file {file}')
         super(SqlServerBeanFactory,cls).createConfigBean(file)
+        cls.cfg_mapping['name'] = 'sqlserver'
         return SqlServerConfig(**cls.cfg_mapping)
 
 
@@ -78,6 +80,7 @@ class ResultDBBeanFactory(GenerateBeanFactory):
     def createConfigBean(cls, file):
         logger.info(f'resultdb factory create parseBean by file {file}')
         super().createConfigBean(file)
+        cls.cfg_mapping['name'] = 'resultdb'
         return ResultDBConfig(**cls.cfg_mapping)
 
 

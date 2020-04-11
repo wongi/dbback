@@ -17,6 +17,7 @@ def singleton(cls):  # 配置文件单例装饰器
 
 #  每个数据库的配置都有对应的ip信息和地址，抽取成父类Config
 class Config:
+    name = ''
     host_ips = []         # 数据库服务其实例IP列表
     host_login_user = ''  # 数据库服务器登陆用户信息 user/pass
     host_login_pass = ''
@@ -30,6 +31,7 @@ class Config:
             raise ValueError
 
     def __init__(self, **kwargs):
+        self.name = kwargs.get('name')
         self.host_ips = kwargs.get('host_ips')
         self.host_login_user,self.host_login_pass = self.get_user_pass(kwargs.get('host_login_info'))
 
@@ -50,7 +52,7 @@ class ResultDBConfig(Config):
 
     def __init__(self, **kwargs):
 
-        super().__init__(host_ips=kwargs.get('result_db_ips'), host_login_info=kwargs.get('result_db_login_info'))
+        super().__init__(name=kwargs.get('name'), host_ips=kwargs.get('result_db_ips'), host_login_info=kwargs.get('result_db_login_info'))
         self.db_type = kwargs.get('result_db_type')
         self.db_name = kwargs.get('result_db_name')
         self.tb_name = kwargs.get('result_db_tbname')
@@ -65,6 +67,7 @@ class ResultDBConfig(Config):
                f'tb_name:{self.tb_name} \n' \
                f'db_name:{self.db_name} \n'
 
+
 #  数据服务器的配置
 class HostConfig(Config):
     host_bak_script_file = ''  # 数据库服务器备份脚本
@@ -75,7 +78,7 @@ class HostConfig(Config):
     host_proceed_flag = 0   # 数据库对应的操作标志
 
     def __init__(self, **kwargs):
-        super().__init__(host_ips=kwargs.get('host_ips'), host_login_info=kwargs.get('host_login_info'))
+        super().__init__(name=kwargs.get('name'), host_ips=kwargs.get('host_ips'), host_login_info=kwargs.get('host_login_info'))
         self.host_bak_script_file = kwargs.get('host_bak_script_file')
         self.host_bak_dir_name = kwargs.get('host_bak_dir_name')
         self.host_bak_log_name = kwargs.get('host_bak_log_name')
@@ -88,7 +91,8 @@ class HostConfig(Config):
 @singleton
 class MysqlHostConfig(HostConfig):
     def __init__(self, **kwargs):
-        super().__init__(host_ips=kwargs.get('mysql_host_ips'),
+        super().__init__(name=kwargs.get('name'),
+                         host_ips=kwargs.get('mysql_host_ips'),
                          host_login_info=kwargs.get('mysql_host_login_info'),
                          host_bak_script_file=kwargs.get('mysql_host_bak_script_file'),
                          host_bak_dir_name=kwargs.get('mysql_host_bak_dir_name'),
@@ -105,7 +109,7 @@ class MysqlHostConfig(HostConfig):
                f'host_bak_dir_name:{self.host_bak_dir_name} \n' \
                f'host_bak_log_name:{self.host_bak_log_name} \n' \
                f'oss_bucket:{self.oss_bucket} \n' \
-               f'host_proceed_flag:{self.host_proceed_flag}'
+               f'host_proceed_flag:{self.host_proceed_flag} \n'
 
 
 #  sqlserver数据服务器的配置
@@ -117,7 +121,8 @@ class SqlServerConfig(HostConfig):
     sqlserver_db_login_pass = ''
 
     def __init__(self, **kwargs):
-        super().__init__(host_ips=kwargs.get('sqlserver_host_ips'),
+        super().__init__(name=kwargs.get('name'),
+                         host_ips=kwargs.get('sqlserver_host_ips'),
                          host_login_info=kwargs.get('sqlserver_host_login_info'),
                          host_bak_script_file=kwargs.get('sqlserver_host_bak_script_file'),
                          host_bak_dir_name=kwargs.get('sqlserver_host_bak_dir_name'),
