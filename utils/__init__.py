@@ -22,6 +22,7 @@ log_cfg_path = root_path + os.path.sep + cfg_path + os.path.sep + 'log.conf'
 mysql_cfg_path = root_path + os.path.sep + cfg_path + os.path.sep + 'mysql_cfg.ini'
 sqlserver_cfg_path = root_path + os.path.sep + cfg_path + os.path.sep + 'sqlserver_cfg.ini'
 resultdb_cfg_path = root_path + os.path.sep + cfg_path + os.path.sep + 'result_db_cfg.ini'
+scripts_path = root_path + os.path.sep + 'scripts' + os.path.sep + os.path.sep
 
 # 日志全局配置
 def get_logger(name=''):
@@ -56,3 +57,6 @@ def timer(func):
         cost_time = '0.'+ str((end_time - start_time).microseconds)[0 : 2]
     root_logger.info(f'开始：{start_time.strftime(fstr)}, 结束：{end_time.strftime(fstr)}, 花费：{cost_time}s')
   return wrapper
+
+
+local_ip = 'localhost'

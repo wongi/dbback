@@ -17,6 +17,7 @@ class Param(Enum):
     GREP = 'grep '
     CP = 'cp '
 
+
 # windos连接方式和linux连接方式
 class ConnectHost:
     _ip = None

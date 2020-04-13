@@ -2,7 +2,9 @@
 import fnmatch
 import utils
 from utils.factory import factory
+from utils.connhosts import ConnectUnix, ConnectWindos, linuxcmd, wincmd
 import os
+from entity.relation import Result
 
 logger = utils.get_logger()
 
@@ -12,6 +14,25 @@ sqlserver = 'sqlserver'
 resultdb = 'result_db'
 linux_port = ['22']
 window_port = ['3389']
+
+
+# 通过结果实例Result的参数在linux进行备份
+def do_linux_bak(r, v):
+    # 获取连接
+    ConnectUnix(r.host_ip, v, )
+    # 判断时间是否设置，设置后，为定时任务，未设置手动备份
+    # 判定目录是不是存在，不存在创建
+    # 如果时间设置不为null，判定定时任务是否开启，没有开启的话，开启任务
+    # 如果时间设置为null, 手动备份
+    # 检测备份结果，并设置状态，或者异常信息
+    pass
+
+
+
+# 通过结果实例Result的参数在windows进行备份
+def do_window_bak(r):
+    pass
+
 
 class Proceed:
     # 1、读取配置文件列表，按照配置文件产生configbean
@@ -49,13 +70,44 @@ class Proceed:
     # 3、备份处理
     @classmethod
     def do_bak(cls, instance):
+        # {'10.1.72.6': '22', '10.1.72.7': '22', '10.1.72.8': '22', '10.1.72.10': '22'}
+        """
+        bak_db_flag = -1
+        bak_check_flag = -1
+        bak_store_flag = -1
+        bak_meta_tb = ''
+        bak_file_name = ''
+        bak_file_size = '0m'
+        bak_total_sum = 0
+        bak_total_size = '0m'
+        bak_script_file = ''
+        bak_dir_name = ''
+        bak_dir_log = ''
+        bak_frequency = 0
+        bak_strategy = ''
+        bak_oss_bucket = ''
+        bak_sys_used = 0
+        error_code = 1
+        error_msg = ''
+        check_time = ''
+        :param instance:
+        :return:
+        """
         # 判断端口22为linux 3389windows
-        # 判断时间是否设置，设置后，为定时任务，未设置手动备份
-
-        # 判定目录是不是存在，不存在创建
-        # 如果时间设置不为null，判定定时任务是否开启，没有开启的话，开启任务
-        # 如果时间设置为null, 手动备份
-        # 检测备份结果，并设置状态，或者异常信息
+        for k, v in instance.host_ips.items():
+            # 构造检测实例
+            r = Result(utils.local_ip, k, instance.name)
+            r.bak_meta_tb = instance.bak_meta_tb
+            r.bak_file_name = instance.bak_file_name
+            r.bak_script_file = instance.host_bak_script_file
+            r.bak_dir_name = instance.host_bak_file_dir_name
+            r.bak_dir_log = instance.host_bak_log_dir_name
+            r.bak_frequency = instance.host_bak_time
+            if v in linux_port:
+                do_linux_bak(r, v, instance)
+                pass
+            elif v in window_port:
+                do_window_bak(r, v, instance)
         pass
 
     # 4、备份检测

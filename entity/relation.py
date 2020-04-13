@@ -35,11 +35,8 @@ class Config:
         self.host_ips = kwargs.get('host_ips')
         self.host_login_user,self.host_login_pass = self.get_user_pass(kwargs.get('host_login_info'))
 
-    @staticmethod  # 确认数据库服务器的操作系统环境
-    def get_host_system():
-
-        pass
-
+    def __getattr__(self, item):
+        return '-'
 
 #  明细汇聚的数据库的配置
 @singleton
@@ -81,9 +78,10 @@ class HostConfig(Config):
     def __init__(self, **kwargs):
         super().__init__(name=kwargs.get('name'), host_ips=kwargs.get('host_ips'), host_login_info=kwargs.get('host_login_info'))
         self.host_bak_script_file = kwargs.get('host_bak_script_file')
-        self.host_bak_dir_name = kwargs.get('host_bak_dir_name')
-        self.host_bak_log_name = kwargs.get('host_bak_log_name')
+        self.host_bak_file_dir_name = kwargs.get('host_bak_file_dir_name')
         self.host_bak_file_name = kwargs.get('host_bak_file_name')
+        self.host_bak_log_dir_name = kwargs.get('host_bak_log_dir_name')
+        self.host_bak_log_name = kwargs.get('host_bak_log_name')
         self.host_bak_time = kwargs.get('host_bak_time')
         self.oss_bucket = kwargs.get('oss_bucket')
         self.host_proceed_flag = kwargs.get('host_proceed_flag')
@@ -97,19 +95,23 @@ class MysqlHostConfig(HostConfig):
                          host_ips=kwargs.get('mysql_host_ips'),
                          host_login_info=kwargs.get('mysql_host_login_info'),
                          host_bak_script_file=kwargs.get('mysql_host_bak_script_file'),
-                         host_bak_dir_name=kwargs.get('mysql_host_bak_dir_name'),
-                         host_bak_log_name=kwargs.get('mysql_host_bak_log_name'),
+                         host_bak_file_dir_name=kwargs.get('mysql_host_bak_file_dir_name'),
                          host_bak_file_name=kwargs.get('mysql_host_bak_file_name'),
+                         host_bak_log_dir_name=kwargs.get('mysql_host_bak_log_dir_name'),
+                         host_bak_log_name=kwargs.get('mysql_host_bak_log_name'),
                          host_bak_time=kwargs.get('mysql_host_bak_time'),
                          oss_bucket=kwargs.get('mysql_oss_bucket'),
                          host_proceed_flag=kwargs.get('mysql_host_proceed_flag'))
 
     def __str__(self):
-        return f'host_ips:{self.host_ips} \n' \
+        return f'name:{self.name} \n' \
+               f'host_ips:{self.host_ips} \n' \
                f'host_login_user:{self.host_login_user} \n' \
                f'host_login_pass:{self.host_login_pass} \n' \
                f'host_bak_script_file:{self.host_bak_script_file} \n' \
-               f'host_bak_dir_name:{self.host_bak_dir_name} \n' \
+               f'host_bak_file_dir_name:{self.host_bak_file_dir_name} \n' \
+               f'host_bak_file_name:{self.host_bak_file_name} \n' \
+               f'host_bak_log_dir_name:{self.host_bak_log_dir_name} \n' \
                f'host_bak_log_name:{self.host_bak_log_name} \n' \
                f'oss_bucket:{self.oss_bucket} \n' \
                f'host_proceed_flag:{self.host_proceed_flag} \n'
@@ -128,9 +130,10 @@ class SqlServerConfig(HostConfig):
                          host_ips=kwargs.get('sqlserver_host_ips'),
                          host_login_info=kwargs.get('sqlserver_host_login_info'),
                          host_bak_script_file=kwargs.get('sqlserver_host_bak_script_file'),
-                         host_bak_dir_name=kwargs.get('sqlserver_host_bak_dir_name'),
-                         host_bak_log_name=kwargs.get('sqlserver_host_bak_log_name'),
+                         host_bak_file_dir_name=kwargs.get('sqlserver_host_bak_file_dir_name'),
                          host_bak_file_name=kwargs.get('sqlserver_host_bak_file_name'),
+                         host_bak_log_dir_name=kwargs.get('sqlserver_host_bak_log_dir_name'),
+                         host_bak_log_name=kwargs.get('sqlserver_host_bak_log_name'),
                          host_bak_time=kwargs.get('sqlserver_host_bak_time'),
                          oss_bucket=kwargs.get('sqlserver_oss_bucket'),
                          host_proceed_flag = kwargs.get('sqlserver_host_proceed_flag'))
@@ -138,11 +141,14 @@ class SqlServerConfig(HostConfig):
         self.sqlserver_db_login_user, self.sqlserver_db_login_pass = super().get_user_pass(kwargs.get('sqlserver_db_login_info'))
 
     def __str__(self):
-        return f'host_ips:{self.host_ips} \n' \
+        return f'name:{self.name} \n' \
+               f'host_ips:{self.host_ips} \n' \
                f'host_login_user:{self.host_login_user} \n' \
                f'host_login_pass:{self.host_login_pass} \n' \
                f'host_bak_script_file:{self.host_bak_script_file} \n' \
-               f'host_bak_dir_name:{self.host_bak_dir_name} \n' \
+               f'host_bak_file_dir_name:{self.host_bak_file_dir_name} \n' \
+               f'host_bak_file_name:{self.host_bak_file_name} \n' \
+               f'host_bak_log_dir_name:{self.host_bak_log_dir_name} \n' \
                f'host_bak_log_name:{self.host_bak_log_name} \n' \
                f'oss_bucket:{self.oss_bucket} \n' \
                f'host_proceed_flag:{self.host_proceed_flag} \n' \
@@ -166,7 +172,7 @@ class Result(object):  # 待修正
     bak_script_file = ''
     bak_dir_name = ''
     bak_dir_log = ''
-    bak_frequency = 0
+    bak_time = 0
     bak_strategy = ''
     bak_oss_bucket = ''
     bak_sys_used = 0
@@ -174,6 +180,35 @@ class Result(object):  # 待修正
     error_msg = ''
     check_time = ''
 
-    def __init__(self, rs_config, host_config):
-        pass
+    def __init__(self, local_ip, host_ip, db_type):  # 初始化每个ip实例的instance
+        self.local_ip = local_ip
+        self.host_ip = host_ip
+        self.db_type = db_type
 
+    def __str__(self):
+        return f'local_ip:{self.local_ip} \n' \
+               f'host_ip:{self.host_ip} \n' \
+               f'db_type:{self.db_type} \n' \
+               f'bak_db_flag:{self.bak_db_flag} \n' \
+               f'bak_check_flag:{self.bak_check_flag} \n' \
+               f'bak_store_flag:{self.bak_store_flag} \n' \
+               f'bak_meta_tb:{self.bak_meta_tb} \n' \
+               f'bak_file_name:{self.bak_file_name} \n' \
+               f'bak_file_size:{self.bak_file_size} \n' \
+               f'bak_total_sum:{self.bak_total_sum} \n' \
+               f'bak_total_size:{self.bak_total_size} \n' \
+               f'bak_script_name:{self.bak_script_file} \n' \
+               f'bak_dir_name:{self.bak_dir_name} \n' \
+               f'bak_dir_log:{self.bak_dir_log} \n' \
+               f'bak_time:{self.bak_time} \n' \
+               f'bak_strategy:{self.bak_strategy} \n' \
+               f'bak_oss_bucket:{self.bak_oss_bucket} \n' \
+               f'bak_sys_used:{self.bak_sys_used} \n' \
+               f'error_code:{self.error_code} \n' \
+               f'error_msg:{self.error_msg} \n' \
+               f'check_time:{self.check_time} \n'
+
+
+if __name__ == '__main__':
+    c = Config(name='test', host_ips='10.1.72.6:22', host_login_info='root/Wu*123456')
+    print(c.bak_meta_tb)
