@@ -4,7 +4,7 @@ import utils
 import re
 import configparser
 
-logger = utils.root_logger
+logger = utils.get_logger()
 
 
 #  对config中设置的文件配置进行解析，将值赋值给实体类

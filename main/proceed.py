@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import fnmatch
 import utils
+import re
 from utils.factory import factory
 from utils.connhosts import ConnectUnix, ConnectWindos, linuxcmd, wincmd,Param
 import os
 from entity.relation import Result
+from crontab import CronTab,CronItem
 
 logger = utils.get_logger()
 
@@ -14,6 +16,8 @@ sqlserver = 'sqlserver'
 resultdb = 'result_db'
 linux_port = ['22']
 window_port = ['3389']
+crontab_str='*/3 * * * * echo date >> ~/time.log # time log job'
+crontab_flag=False
 
 
 def get_script_file(name):
@@ -23,13 +27,30 @@ def get_script_file(name):
 
 
 # 通过结果实例Result的参数在linux进行备份
-def do_linux_bak(r, k, v, instance):
+def linux_bak(r, k, v, instance):
+    global crontab_flag, crontab_str
+    crontab_str.strip('\n')
+    # 检测本地机器是否有定时任务设置
+    if instance.host_bak_time :
+        user_cron = CronTab('threeboys33')
+        lines = user_cron.crons
+        for i in lines:
+            if crontab_str in str(i):
+                crontab_flag = True
+                break
+
+        if lines is None or crontab_flag is False:
+            user_cron.append(CronItem(command=crontab_str,user='threeboys33'), line=crontab_str)
+            user_cron.write()
+
     logger.info(f'开始获取{k}的连接实例')
     linux = ConnectUnix(k, v, instance.host_login_user, instance.host_login_pass)
     login_conn = linux.getConnectHost()
     scp_conn = linux.getSCPConnect()
     # 判定目录是不是存在，不存在创建
-    res = linuxcmd.check_file_exists(instance.host_bak_script_file, login_conn)
+    res = linuxcmd.check_file_exists(instance.host_bak_script_file,login_conn)
+    linuxcmd.check_dir_exists(instance.host_bak_file_dir_name,True, login_conn)
+    linuxcmd.check_dir_exists(instance.host_bak_log_dir_name, True, login_conn)
     # 如果时间设置不为null，判定定时任务是否开启，没有开启的话，开启任务
     # 如果时间设置为null, 手动备份
     # 检测备份结果，并设置状态，或者异常信息
@@ -45,7 +66,7 @@ def do_linux_bak(r, k, v, instance):
 
 
 # 通过结果实例Result的参数在windows进行备份
-def do_window_bak(r, k, v, instance):
+def window_bak(r, k, v, instance):
     pass
 
 
@@ -119,10 +140,10 @@ class Proceed:
             r.bak_dir_log = instance.host_bak_log_dir_name
             r.bak_frequency = instance.host_bak_time
             if v in linux_port:
-                do_linux_bak(r, k, v, instance)
+                linux_bak(r, k, v, instance)
                 pass
             elif v in window_port:
-                do_window_bak(r, k, v, instance)
+                window_bak(r, k, v, instance)
         pass
 
     # 4、备份检测

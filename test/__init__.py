@@ -1,6 +1,7 @@
 import configparser
 import utils
 import re
+from crontab import CronItem,CronTab
 
 logger = utils.get_logger()
 
@@ -89,5 +90,35 @@ def test_clear_dict():
 # dictcon.clear()
 # print(dictcon)
 
-list = ['1','2','3','4']
-print('1' in list)
+# list = ['1','2','3','4']
+# print('1' in list)
+
+
+crontab_str='echo date >> ~/time.log'
+crontab_time = 5
+crontab_comment = 'test task'
+crontab_flag=False
+crontab_user = 'threeboys33'
+crontab_time_str = ''
+def test_crontab():
+    global crontab_flag
+    crontab_str.strip('\n')
+    # 检测本地机器是否有定时任务设置
+    if crontab_time:
+        user_cron = CronTab(crontab_user)
+        crons = user_cron.crons
+        for item in crons:
+            if crontab_str in item:
+                crontab_flag = True
+                break
+        if crontab_flag == False:
+            item = user_cron.new(crontab_str, crontab_comment, crontab_user)
+            item.setall()
+            user_cron.write()
+        else:
+            for task in user_cron:
+                if task.comment == crontab_comment and task.hour != crontab_time:
+                    task.hour = crontab_time
+                    user_cron.write()
+
+test_crontab()
