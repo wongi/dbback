@@ -3,7 +3,8 @@ from enum import Enum
 import paramiko
 import utils
 import winrm
-from  utils.connhosts import linuxcmd,wincmd
+import os
+from utils.connhosts import linuxcmd,wincmd
 
 logger = utils.get_logger()
 

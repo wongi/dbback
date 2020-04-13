@@ -2,7 +2,7 @@
 import fnmatch
 import utils
 from utils.factory import factory
-from utils.connhosts import ConnectUnix, ConnectWindos, linuxcmd, wincmd
+from utils.connhosts import ConnectUnix, ConnectWindos, linuxcmd, wincmd,Param
 import os
 from entity.relation import Result
 
@@ -16,21 +16,36 @@ linux_port = ['22']
 window_port = ['3389']
 
 
+def get_script_file(name):
+    for i in os.listdir(utils.scripts_path):
+        if fnmatch.fnmatch(f'{name}.*', i):
+            return utils.scripts_path + os.sep + i
+
+
 # 通过结果实例Result的参数在linux进行备份
-def do_linux_bak(r, v):
-    # 获取连接
-    ConnectUnix(r.host_ip, v, )
-    # 判断时间是否设置，设置后，为定时任务，未设置手动备份
+def do_linux_bak(r, k, v, instance):
+    logger.info(f'开始获取{k}的连接实例')
+    linux = ConnectUnix(k, v, instance.host_login_user, instance.host_login_pass)
+    login_conn = linux.getConnectHost()
+    scp_conn = linux.getSCPConnect()
     # 判定目录是不是存在，不存在创建
+    res = linuxcmd.check_file_exists(instance.host_bak_script_file, login_conn)
     # 如果时间设置不为null，判定定时任务是否开启，没有开启的话，开启任务
     # 如果时间设置为null, 手动备份
     # 检测备份结果，并设置状态，或者异常信息
-    pass
+    if res == 'False':
+        dir_path = os.path.dirname(instance.host_bak_script_file)
+        linuxcmd.check_dir_exists(dir_path, True, login_conn)
+        bak_file = get_script_file(instance.name)
+        logger.info(f'传输{instance.host_bak_script_file}至 {k} 服务器')
+        linuxcmd.exec_scp(scp_conn, Param.W, bak_file, instance.host_bak_script_file)
 
+    cmd_str = linuxcmd.scripts_command(instance.host_bak_script_file)
+    linuxcmd.exec_cmd(login_conn, cmd_str)
 
 
 # 通过结果实例Result的参数在windows进行备份
-def do_window_bak(r):
+def do_window_bak(r, k, v, instance):
     pass
 
 
@@ -104,10 +119,10 @@ class Proceed:
             r.bak_dir_log = instance.host_bak_log_dir_name
             r.bak_frequency = instance.host_bak_time
             if v in linux_port:
-                do_linux_bak(r, v, instance)
+                do_linux_bak(r, k, v, instance)
                 pass
             elif v in window_port:
-                do_window_bak(r, v, instance)
+                do_window_bak(r, k, v, instance)
         pass
 
     # 4、备份检测

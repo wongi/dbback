@@ -6,7 +6,7 @@ import tarfile
 logger = utils.get_logger()
 
 
-def scripts_command(script_path, args):  # 脚本命令入参
+def scripts_command(script_path, args = ''):  # 脚本命令入参
     if args:
         cmd = f'{script_path} {args}'
         return cmd
@@ -50,3 +50,52 @@ def tar_file(file, name=''):  # 压缩文件
             tar = tarfile.open(name, 'w:gz')
             tar.add(file)
             return base + os.sep + name
+
+
+# 检测文件是否存在
+def check_file_exists(file, conn=None):
+    if conn is None:
+        if not os.path.isfile(file):
+            logger.error(f'The file {file} does not exists')
+            return 'False'
+    else:
+        cmd = f'if [ -f {file} ]; then echo True; else  echo False; fi'
+        res = exec_cmd(conn, cmd).strip('\n')
+        if res == 'True':
+            logger.info(f'file {file} exists')
+            return 'True'
+        else:
+            logger.error(f'file {file} does not exists')
+            return 'False'
+
+
+def check_dir_exists(dir, flag=False, conn=None):
+    if conn is None:
+        if flag is True:
+            if not os.path.isdir(dir):
+                logger.info(f'The dir does not exists, Creating now')
+                os.mkdir(dir)
+
+        else:
+            if not os.path.isdir(dir):
+                logger.error(f'The dir {dir} does not exists')
+                raise FileNotFoundError
+    else:
+        cmd = f'if [ -d {dir} ]; then echo True; else  echo False; fi'
+        res = exec_cmd(conn, cmd).strip('\n')
+        if flag is True:
+            if res == 'False':
+                logger.info(f'The remote dir does not exists, Creating now')
+                cmd = f'mkdir -p {dir}'
+                exec_cmd(conn, cmd)
+
+        else:
+            if res == 'False':
+                logger.error(f'The remote dir {dir} does not exists')
+                raise FileNotFoundError
+
+
+if __name__ == '__main__':
+    unix = connhosts.ConnectUnix('10.1.72.12', '22', 'root', 'Wu*123456')
+    conn = unix.getConnectHost()
+    check_dir_exists('/Users/threeboys33/tools/backup_check/python/test', True)
