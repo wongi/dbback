@@ -2,7 +2,7 @@ import configparser
 import utils
 import re
 from crontab import CronItem,CronTab
-
+from datetime import datetime
 logger = utils.get_logger()
 
 # 测试配置文件的读取
@@ -95,11 +95,11 @@ def test_clear_dict():
 
 
 crontab_str='echo date >> ~/time.log'
-crontab_time = 5
+crontab_time = 7
 crontab_comment = 'test task'
 crontab_flag=False
 crontab_user = 'threeboys33'
-crontab_time_str = ''
+
 def test_crontab():
     global crontab_flag
     crontab_str.strip('\n')
@@ -107,18 +107,25 @@ def test_crontab():
     if crontab_time:
         user_cron = CronTab(crontab_user)
         crons = user_cron.crons
+
         for item in crons:
-            if crontab_str in item:
+            if crontab_str in str(item):
                 crontab_flag = True
                 break
+
         if crontab_flag == False:
             item = user_cron.new(crontab_str, crontab_comment, crontab_user)
-            item.setall()
+            item.setall(f'0 {crontab_time} * * *')
             user_cron.write()
         else:
             for task in user_cron:
                 if task.comment == crontab_comment and task.hour != crontab_time:
-                    task.hour = crontab_time
+                    task.setall(f'0 {crontab_time} * * *')
                     user_cron.write()
 
-test_crontab()
+# test_crontab()
+
+
+time = datetime.now()
+datetime = time.strftime('%Y%m%d')
+print(datetime)

@@ -17,6 +17,7 @@ class Param(Enum):
     MKDIR = 'mkdir '
     GREP = 'grep '
     CP = 'cp '
+    LS = 'ls -al '
 
 
 # windos连接方式和linux连接方式

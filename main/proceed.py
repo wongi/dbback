@@ -2,6 +2,7 @@
 import fnmatch
 import utils
 import re
+from datetime import datetime
 from utils.factory import factory
 from utils.connhosts import ConnectUnix, ConnectWindos, linuxcmd, wincmd,Param
 import os
@@ -16,8 +17,38 @@ sqlserver = 'sqlserver'
 resultdb = 'result_db'
 linux_port = ['22']
 window_port = ['3389']
-crontab_str='*/3 * * * * echo date >> ~/time.log # time log job'
+
+crontab_str='echo date >> ~/time.log'
+crontab_time = 7
+crontab_comment = 'database backup task'
 crontab_flag=False
+crontab_user = 'threeboys33'
+
+time = datetime.now()
+date_time = time.strftime('%Y%m%d')
+
+def config_crontab(crontab_user, instance):
+    global crontab_flag
+    crontab_str.strip('\n')
+    # 检测本地机器是否有定时任务设置
+    if crontab_time:
+        user_cron = CronTab(crontab_user)
+        crons = user_cron.crons
+
+        for item in crons:
+            if crontab_str in str(item):
+                crontab_flag = True
+                break
+
+        if crontab_flag == False:
+            item = user_cron.new(crontab_str, crontab_comment, crontab_user)
+            item.setall(f'0 {instance.host_bak_time} * * *')
+            user_cron.write()
+        else:
+            for task in user_cron:
+                if task.comment == crontab_comment and task.hour != instance.host_bak_time:
+                    task.setall(f'0 {instance.host_bak_time} * * *')
+                    user_cron.write()
 
 
 def get_script_file(name):
@@ -28,26 +59,15 @@ def get_script_file(name):
 
 # 通过结果实例Result的参数在linux进行备份
 def linux_bak(r, k, v, instance):
-    global crontab_flag, crontab_str
-    crontab_str.strip('\n')
-    # 检测本地机器是否有定时任务设置
-    if instance.host_bak_time :
-        user_cron = CronTab('threeboys33')
-        lines = user_cron.crons
-        for i in lines:
-            if crontab_str in str(i):
-                crontab_flag = True
-                break
-
-        if lines is None or crontab_flag is False:
-            user_cron.append(CronItem(command=crontab_str,user='threeboys33'), line=crontab_str)
-            user_cron.write()
+    # 当bak——time不为null时，检测本地机器是否有定时任务设置,没有则添加上，如果时间又变化修改时间
+    config_crontab(crontab_user, instance)
 
     logger.info(f'开始获取{k}的连接实例')
     linux = ConnectUnix(k, v, instance.host_login_user, instance.host_login_pass)
     login_conn = linux.getConnectHost()
     scp_conn = linux.getSCPConnect()
     # 判定目录是不是存在，不存在创建
+    logger.info('check ')
     res = linuxcmd.check_file_exists(instance.host_bak_script_file,login_conn)
     linuxcmd.check_dir_exists(instance.host_bak_file_dir_name,True, login_conn)
     linuxcmd.check_dir_exists(instance.host_bak_log_dir_name, True, login_conn)
@@ -61,8 +81,22 @@ def linux_bak(r, k, v, instance):
         logger.info(f'传输{instance.host_bak_script_file}至 {k} 服务器')
         linuxcmd.exec_scp(scp_conn, Param.W, bak_file, instance.host_bak_script_file)
 
-    cmd_str = linuxcmd.scripts_command(instance.host_bak_script_file)
-    linuxcmd.exec_cmd(login_conn, cmd_str)
+    sh_cmd = linuxcmd.scripts_command(instance.host_bak_script_file)
+    sh_res = linuxcmd.exec_cmd(login_conn, sh_cmd)
+
+    # ls root/mysql/backup/data | grep -E full_mysql_.*} | grep date_time
+    ls_bak_file_cmd = f'ls {instance.host_bak_file_dir_nam} | grep -E {instance.host_bak_file_name} | grep {date_time} | wc -l'
+    ls_bak_file_res = linuxcmd.exec_cmd(login_conn, ls_bak_file_cmd)
+
+    ls_bak_log_cmd = f'ls {instance.host_bak_log_dir_name} | grep -E {instance.host_bak_log_name} | grep {date_time}'
+    ls_bak_log_res = linuxcmd.exec_cmd(login_conn, ls_bak_file_cmd).strip('\n')
+
+    cat_bak_log_cmd = f'grep -in error {instance.host_bak_log_dir_name}/{ls_bak_file_res}'
+
+    # ls root/mysql/backup/logs | grep -E full_log_\d{6} | grep data_time | grep -in error
+    cat_bak_log_cmd = f'grep -in error {instance.host_bak_log_dir_nam}'
+
+    print(str)
 
 
 # 通过结果实例Result的参数在windows进行备份
@@ -106,29 +140,6 @@ class Proceed:
     # 3、备份处理
     @classmethod
     def do_bak(cls, instance):
-        # {'10.1.72.6': '22', '10.1.72.7': '22', '10.1.72.8': '22', '10.1.72.10': '22'}
-        """
-        bak_db_flag = -1
-        bak_check_flag = -1
-        bak_store_flag = -1
-        bak_meta_tb = ''
-        bak_file_name = ''
-        bak_file_size = '0m'
-        bak_total_sum = 0
-        bak_total_size = '0m'
-        bak_script_file = ''
-        bak_dir_name = ''
-        bak_dir_log = ''
-        bak_frequency = 0
-        bak_strategy = ''
-        bak_oss_bucket = ''
-        bak_sys_used = 0
-        error_code = 1
-        error_msg = ''
-        check_time = ''
-        :param instance:
-        :return:
-        """
         # 判断端口22为linux 3389windows
         for k, v in instance.host_ips.items():
             # 构造检测实例

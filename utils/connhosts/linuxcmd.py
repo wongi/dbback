@@ -75,11 +75,15 @@ def check_dir_exists(dir, flag=False, conn=None):
             if not os.path.isdir(dir):
                 logger.info(f'The dir does not exists, Creating now')
                 os.mkdir(dir)
+            else:
+                logger.info(f'The dir {dir} exists')
 
         else:
             if not os.path.isdir(dir):
                 logger.error(f'The dir {dir} does not exists')
                 raise FileNotFoundError
+            else:
+                logger.info(f'The dir {dir} exists')
     else:
         cmd = f'if [ -d {dir} ]; then echo True; else  echo False; fi'
         res = exec_cmd(conn, cmd).strip('\n')
@@ -88,11 +92,15 @@ def check_dir_exists(dir, flag=False, conn=None):
                 logger.info(f'The remote dir does not exists, Creating now')
                 cmd = f'mkdir -p {dir}'
                 exec_cmd(conn, cmd)
+            else:
+                logger.info(f'The dir {dir} exists')
 
         else:
             if res == 'False':
                 logger.error(f'The remote dir {dir} does not exists')
                 raise FileNotFoundError
+            else:
+                logger.info(f'The dir {dir} exists')
 
 
 if __name__ == '__main__':
